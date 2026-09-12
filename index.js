@@ -1,36 +1,59 @@
 const http = require('http');
+const EventEmitter = require('events');
+const logger = require('./logger');
 
-// Вычисление числа Пи методом Нилакантхи
-// Формула: π = 3 + 4/(2·3·4) − 4/(4·5·6) + 4/(6·7·8) − ...
-function calculatePi(precision) {
-  let pi = 3;
-  let sign = 1;
-  let n = 2;
-  for (let i = 0; i < precision; i++) {
-    pi += sign * (4 / (n * (n + 1) * (n + 2)));
-    sign *= -1;
-    n += 2;
+class AppServer extends EventEmitter {
+  constructor() {
+    super();
+    this.server = null;
+    this.port = null;
   }
-  return pi.toFixed(precision);
+
+  start(port) {
+    this.port = port;
+
+    this.server = http.createServer((req, res) => {
+      // Генерируем событие при получении запроса
+      this.emit('request:received', { url: req.url, method: req.method });
+
+      // Отвечаем всем одинаково
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('Hello from Event-Driven Server!');
+    });
+
+    this.server.listen(port, () => {
+      this.emit('server:started', port);
+    });
+  }
+
+  stop() {
+    if (this.server) {
+      this.server.close(() => {
+        this.emit('server:stopped');
+      });
+    }
+  }
 }
 
-const studentInfo = {
-  fullName: 'Какулина Валерия Александровна',   
-  group: '401',                     
-  journalNumber: 7,                  
-};
+const app = new AppServer();
 
-const piValue = calculatePi(studentInfo.journalNumber);
+logger.setupLogger(app);
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-  res.end(`
-    <h1>${studentInfo.fullName}</h1>
-    <h2>Группа: ${studentInfo.group}</h2>
-    <h2>Число Пи: ${piValue}</h2>
-  `);
+app.on('server:started', (port) => {
+  console.log(`Сервер запущен на порту ${port}`);
 });
 
-server.listen(3000, () => {
-  console.log('Сервер запущен на http://localhost:3000');
+app.on('request:received', ({ method, url }) => {
+  console.log(`Получен запрос: ${method} ${url}`);
 });
+
+app.on('server:stopped', () => {
+  console.log('Сервер остановлен');
+});
+
+app.start(3000);
+
+// Эмуляция остановки через 10 секунд
+setTimeout(() => {
+  app.stop();
+}, 10000);
