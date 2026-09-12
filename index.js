@@ -1,7 +1,7 @@
 const http = require('http');
 const EventEmitter = require('events');
 const logger = require('./logger');
-
+// Задание 1: Класс AppServer с событиями
 class AppServer extends EventEmitter {
   constructor() {
     super();
@@ -12,8 +12,10 @@ class AppServer extends EventEmitter {
   start(port) {
     this.port = port;
     this.server = http.createServer((req, res) => {
+      // Генерируем событие при получении запроса
       this.emit('request:received', { url: req.url, method: req.method });
 
+      // Отвечаем всем одинаково
       res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end('Hello from Event-Driven Server!');
     });
@@ -34,7 +36,7 @@ class AppServer extends EventEmitter {
 
 const app = new AppServer();
 
-//Задание 2
+// Задание 2: Подключаем логгер
 logger.setupLogger(app);
 
 app.on('server:started', (port) => {
@@ -53,4 +55,4 @@ app.start(3000);
 
 setTimeout(() => {
   app.stop();
-}, 60000);
+}, 10000);
