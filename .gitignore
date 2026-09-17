@@ -2,3 +2,11 @@ node_modules/
 .env
 *.log
 data/
+lr14/project_7/
+lr14/source_7/
+lr14/backup_7/
+lr14/data_7.txt
+lr14/student_7.txt
+lr14/report_7.json
+lr14/processed_7.txt
+lr14/sync_report_7.txt
