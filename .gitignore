@@ -18,3 +18,9 @@ lr16/screenshots/
 lr16/books.json
 lr16/login.json
 lr16/library.log
+lr17/node_modules/
+lr17/screenshots/
+lr17/*.txt
+lr17/result*.json
+lr17/my-cli.exe
+lr17/config.json
