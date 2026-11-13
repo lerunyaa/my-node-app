@@ -24,3 +24,5 @@ lr17/*.txt
 lr17/result*.json
 lr17/my-cli.exe
 lr17/config.json
+lr19/node_modules/
+lr19/screenshots/
