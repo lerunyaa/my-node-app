@@ -24,3 +24,8 @@ lr17/*.txt
 lr17/result*.json
 lr17/my-cli.exe
 lr17/config.json
+lr20/node_modules/
+lr20/screenshots/
+lr20/public/big-file.txt
+lr20/large.json
+lr20/*.pem
