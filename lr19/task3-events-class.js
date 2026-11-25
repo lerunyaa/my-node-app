@@ -1,55 +1,57 @@
 const EventEmitter = require('events');
+const GROUP = '401';
 
 class DatabaseConnection extends EventEmitter {
-  constructor(group) {
+  constructor() {
     super();
-    this.group = group;
     this.connected = false;
   }
 
   connect() {
-    this.emit('connect', { group: this.group });
     this.connected = true;
+    this.emit('connect');
   }
 
-  query(sql, result) {
+  query(sql) {
     if (!this.connected) {
       this.emit('error', new Error('Нет соединения'));
       return;
     }
-    this.emit('query', sql);
-    this.emit('result', result);
+    let result;
+    if (sql.toUpperCase().startsWith('SELECT')) {
+      result = '50 записей';
+    } else if (sql.toUpperCase().startsWith('INSERT')) {
+      result = '1 запись добавлена';
+    } else {
+      result = 'OK';
+    }
+    this.emit('query', sql, result);
   }
 
   close() {
-    this.emit('close');
     this.connected = false;
+    this.emit('close');
   }
 
-  forceError(message) {
+  fail(message) {
     this.emit('error', new Error(message));
   }
 }
 
-const db = new DatabaseConnection('ББМО-01-23');
+console.log(`=== DatabaseConnection (группа ${GROUP}) ===`);
 
-console.log('=== DatabaseConnection (группа ББМО-01-23) ===');
+const db = new DatabaseConnection();
 
 db.on('connect', () => {
-  console.log('[EVENT] Подключение к БД...');
   console.log('[EVENT] Соединение установлено');
 });
 
-db.on('query', (sql) => {
+db.on('query', (sql, result) => {
   console.log(`[EVENT] Выполнение запроса: ${sql}`);
-});
-
-db.on('result', (res) => {
-  console.log(`[EVENT] Результат: ${res}`);
+  console.log(`[EVENT] Результат: ${result}`);
 });
 
 db.on('close', () => {
-  console.log('[EVENT] Закрытие соединения');
   console.log('[EVENT] Соединение закрыто');
 });
 
@@ -57,11 +59,12 @@ db.on('error', (err) => {
   console.log(`[EVENT] Ошибка: ${err.message}`);
 });
 
+console.log('[EVENT] Подключение к БД...');
 db.connect();
-db.query('SELECT * FROM students', '50 записей');
-db.query('INSERT INTO students', '1 запись добавлена');
+db.query('SELECT * FROM students');
+db.query('INSERT INTO students ...');
 db.close();
 
 console.log('\n=== Демонстрация ошибки ===');
-db.forceError('Connection timeout');
+db.fail('Connection timeout');
 console.log('(без слушателя error — процесс упал бы с исключением)');
