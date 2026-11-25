@@ -27,3 +27,7 @@ lr17/config.json
 lr18/node_modules/
 lr18/screenshots/
 lr18/monitor.log
+lr20/node_modules/
+lr20/screenshots/
+lr20/access.log
+lr20/big.json
